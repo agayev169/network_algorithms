@@ -52,8 +52,8 @@ def dfs(gr, orig, dest, edges=[]):
 
     return edges
 
-filename = "cities_in_az.csv"
-# filename = "airports.csv"
+# filename = "cities_in_az.csv"
+filename = "airports.csv"
 gr = graph()
 
 data = pd.read_csv(filename)
@@ -84,8 +84,6 @@ if filename == "cities_in_az.csv":
     plt.show()
 
 elif filename == "airports.csv":
-    data = pd.read_csv(filename)
-
     for i in range(len(data)):
         d = data.loc[i].values
 
@@ -102,8 +100,10 @@ elif filename == "airports.csv":
     for e in res:
         print(e)
 
-    cost = sum([e.get_weight() for e in res])
-    print(f"Total cost of the path: {cost}")
+    arr_t = sum([data[(data["Origin"] == e.get_endpoints()[0].get_label()) & (data["Dest"] == e.get_endpoints()[1].get_label()) & (data["Distance"] == e.get_weight())].reset_index(drop=True)["AirTime"].values[0] for e in res])
+    print(f"Total arrival time of the path: {arr_t}")
+    dist = sum([e.get_weight() for e in res])
+    print(f"Cumulative distance of the path: {dist}")
 
     g = nx.from_pandas_edgelist(data, source="Origin", target="Dest", edge_attr="Distance")
     plt.figure()
