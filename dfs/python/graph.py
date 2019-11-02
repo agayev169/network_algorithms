@@ -14,6 +14,14 @@ class vertex:
         self.__visited = visited
 
     
+    def visit(self):
+        self.__visited = True
+
+
+    def is_visited(self):
+        return self.__visited
+
+    
     def get_label(self):
         return self.__label
 
@@ -73,12 +81,15 @@ class edge:
     def __repr__(self):
         return f"{self.__label}: {self.__endpoints[0]} -> {self.__endpoints[1]} ({self.__weight})"
 
+
+    def __str__(self):
+        return f"{self.__label}: {self.__endpoints[0]} -> {self.__endpoints[1]} ({self.__weight})"
+
     
     def __eq__(self, other):
-        return isinstance(other, edge) and                                                                       \
-             ((self.__endpoints[0] == other.__endpoints[0] and self.__endpoints[1] == other.__endpoints[1]) or   \
-              (self.__endpoints[0] == other.__endpoints[1] and self.__endpoints[1] == other.__endpoints[0])) and \
-               self.__weight == other.__weight
+        return (isinstance(other, edge) and                                                                      \
+               (self.__endpoints[0] == other.__endpoints[0] and self.__endpoints[1] == other.__endpoints[1]) and \
+                self.__weight == other.__weight)
 
 
 class graph:
@@ -112,6 +123,36 @@ class graph:
         return None
 
 
+    def get_edge(self, v1, v2):
+        """
+        Get edge connecting two verticies
+
+        Args:
+            v1, v2: vertex or str
+                Vertecies to get an edge between
+        
+        Returns
+            edge: edge
+                An edge connecting verticies. None is returned if no edge found
+        """
+
+        if isinstance(v1, str):
+            v1 = self.get_vertex(v1)
+        
+        if isinstance(v2, str):
+            v2 = self.get_vertex(v2)
+
+        if v1 not in self.__vertices.keys() or v2 not in self.__vertices.keys():
+            raise AssertionError("v1 and v2 must be in the graph")
+
+        for e in self.__edges:
+            endpoints = e.get_endpoints()
+            if endpoints[0] == v1 and endpoints[1] == v2:
+                return e
+
+        return None
+
+
     def add_vertex(self, label):
         """
         Adds a new vertex to the graph
@@ -133,7 +174,7 @@ class graph:
             v = vertex(label)
             self.__vertices[v] = []
 
-        return self.get_vertex(v) if v is None else v
+        return self.get_vertex(label) if v is None else v
 
     
     def add_edge(self, v1, v2, weight=0, label=None):
@@ -159,12 +200,10 @@ class graph:
 
         if self.__edges.count(edge((v1, v2), weight, label)) == 0:
             self.__vertices[v1].append(v2)
-            self.__vertices[v2].append(v1)
             self.__edges.append(edge((v1, v2), weight, label))
             return self.__edges[-1]
         
         return None
-        
 
     
     def degree(self, v):
@@ -365,13 +404,23 @@ class graph:
         Retruns the graph represented as a string
         """
 
+        # res = ""
+        # for v in self.__vertices.keys():
+        #     res += v.__repr__()
+        #     res += " ->"
+        #     for adj in self.__vertices[v]:
+        #         res += f" {adj} ->"
+        #     res += " /\n"
+        # return res
+
+
         res = ""
-        for v in self.__vertices.keys():
-            res += v.__repr__()
-            res += " ->"
-            for adj in self.__vertices[v]:
-                res += f" {adj} ->"
-            res += " /\n"
+        
+        for i, e in enumerate(self.__edges):
+            res += e.__str__()
+            if i != len(self.__edges) - 1:
+                res += "\n"
+
         return res
 
     
@@ -380,13 +429,22 @@ class graph:
         Retruns the graph represented as a string
         """
 
+        # res = ""
+        # for v in self.__vertices.keys():
+        #     res += v.__repr__()
+        #     res += " ->"
+        #     for adj in self.__vertices[v]:
+        #         res += f" {adj} ->"
+        #     res += " /\n"
+        # return res
+
         res = ""
-        for v in self.__vertices.keys():
-            res += v.__repr__()
-            res += " ->"
-            for adj in self.__vertices[v]:
-                res += f" {adj} ->"
-            res += " /\n"
+        
+        for i, e in enumerate(self.__edges):
+            res += e.__str__()
+            if i != len(self.__edges) - 1:
+                res += "\n"
+
         return res
 
 
